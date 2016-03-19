@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <title>AngularJS Restaurant Manager</title>
+      <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+      <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+   </head>
+   <body>
+      <div class="container">
+         <div class="row">
+            <div ng-app="" ng-controller="JobController">
+               <div class="well">
+                  <form>
+                     <h3>AngularJS Job Application</h3>
+                     <hr/>
+                     <div class="form-group">
+                        <label for="job" class="col-sm-3 control-label">Job Name</label>
+                        <div class="col-sm-8 form-group">
+                           <input type="text" name="job" ng-model="newjob.job" class="form-control" placeholder="Job Name" />
+                        </div>
+                        <label for="name" class="col-sm-3 control-label">Programming Language</label>
+                        <div class="col-sm-8 form-group">
+                           <select ng-model="newjob.pl" ng-options="pl.name for pl in pls track by pl.value" class="form-control">
+                              <option value="">Choose Programming Language</option>
+                           </select>
+                        </div>
+                        <label for="name" class="col-sm-3 control-label">Phone Number</label>
+                        <div class="col-sm-8 form-group">
+                           <input type="text" name="phone" ng-model="newjob.phone" class="form-control" placeholder="123-456-7890" />
+                        </div>
+                        <div class="form-group" data-ng-repeat="contact in contacts">
+                           <label for="contact" class="col-sm-3 control-label">Contact</label>
+                           <div class="col-sm-3 form-group">
+                              <input type="text" ng-model="contact.name" name="name" class="form-control" placeholder="Contact Name" />
+                           </div>
+                           <div class="col-sm-3 form-group">
+                              <input type="text" ng-model="contact.title" name="title" class="form-control" placeholder="Contact Title" />
+                           </div>
+                           <div class="col-sm-2 form-group text-right">
+                              <button ng-click="deleteContact($index)" class="btn btn-primary">Remove</button>
+                              <button ng-show="showAddContact(contact)" ng-click="addNewContact()" class="btn btn-primary">Add</button>
+                           </div>
+                        </div>
+                        <div class="col-sm-12">
+                           <hr/>
+                        </div>
+                        <div class="col-sm-9 col-sm-offset-3">
+                           <input type="button" value="Save Job" ng-click="saveJob()" class="btn btn-primary pull-center" />
+                        </div>
+                        <input type="hidden" ng-model="newjob.id" />
+                     </div>
+                  </form>
+                  <div class="clearfix"></div>
+               </div>
+               <table class="table table-striped table-bordered">
+                  <thead>
+                     <tr>
+                        <th>Job Name</th>
+                        <th>Programming Language</th>
+                        <th>Phone Number</th>
+                        <th colspan="2">Contact</th>
+                        <th class="text-right">Action</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="job in jobs">
+                        <td>{{ job.job }}</td>
+                        <td>{{ job.pl.name }}</td>
+                        <td>{{ job.phone }}</td>
+                        <td colspan="2">
+                           <ul class="list-unstyled" ng-repeat="contact in contacts">
+                              <li><strong>Name:</strong> {{ contact.name }}</li>
+                              <li><strong>Title:</strong> {{ contact.title }}</li>
+                            </ul>
+                        </td>
+                        <td class="text-right"> <a href="#" ng-click="edit(job.id)">update</a> | <a href="#" ng-click="delete(job.id)">delete</a>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+
+      
+
+      <!-- Angular JS -->
+      <script type="text/javascript">
+      var uid = 1;
+      function JobController($scope) {
+          $scope.jobs = [];
+          $scope.selectedPL = 0;
+          $scope.contacts = [{
+              id: 'contact1'
+          }];
+          $scope.pls = [{
+              id: 1,
+              value: 'php',
+              name: 'PHP'
+          }, {
+              id: 2,
+              value: 'angular',
+              name: 'Angular JS'
+          }, {
+              id: 3,
+              value: 'node',
+              name: 'Node JS'
+          }, {
+              id: 4,
+              value: 'htmlcss',
+              name: 'HTML5 / CSS3'
+          }, {
+              id: 5,
+              value: 'Csharp',
+              name: 'C#'
+          }, {
+              id: 6,
+              value: 'javamvc',
+              name: 'Java MVC'
+          }, {
+              id: 7,
+              value: 'python',
+              name: 'Python'
+          }];
+          $scope.addNewContact = function () {
+              var newContactNo = $scope.contacts.length + 1;
+              $scope.contacts.push({
+                  id: 'contact' + newContactNo
+              });
+          };
+          $scope.showAddContact = function (contact) {
+              return contact.id === $scope.contacts[$scope.contacts.length - 1].id;
+          };
+          $scope.deleteContact = function (contact) {
+              for (i in $scope.contacts) {
+                  if ($scope.contacts[i].id == $scope.contacts[$scope.contacts.length - 1].id) {
+                      $scope.contacts.splice(i, 1);
+                  }
+              }
+          };
+          $scope.saveJob = function () {
+              if ($scope.newjob.id == null) {
+                  $scope.newjob.id = uid++;
+                  $scope.jobs.push($scope.newjob);
+              } else {
+                  for (i in $scope.jobs) {
+                      if ($scope.jobs[i].id == $scope.newjob.id) {
+                          $scope.jobs[i] = $scope.newjob;
+                      }
+                  }
+              }
+              $scope.newjob = {};
+          };
+          $scope.delete = function (id) {
+              for (i in $scope.jobs) {
+                  if ($scope.jobs[i].id == id) {
+                      $scope.jobs.splice(i, 1);
+                      $scope.newjob = {};
+                  }
+              }
+          };
+          $scope.edit = function (id) {
+              for (i in $scope.jobs) {
+                  if ($scope.jobs[i].id == id) {
+                      $scope.newjob = angular.copy($scope.jobs[i]);
+                  }
+              }
+          };
+      }
+      </script>
+</body>
+</html>
